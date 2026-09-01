@@ -30,6 +30,12 @@ function App() {
         if (typeof loaded.siblings === 'string') loaded.siblings = []
         if (!Array.isArray(loaded.siblings)) loaded.siblings = []
         if (loaded.family && 'siblings' in loaded.family) delete loaded.family.siblings
+        if (!loaded.customFields || typeof loaded.customFields !== 'object') {
+          loaded.customFields = {
+            personal: [], family: [], education: [],
+            horoscope: [], expectations: [], contact: [],
+          }
+        }
         setData(loaded)
         setSelectedTemplate(parsed.template || 'classic')
         if (parsed.photo) setPhoto(parsed.photo)
@@ -92,6 +98,43 @@ function App() {
     }))
   }
 
+  const addCustomField = (section) => {
+    setData((prev) => {
+      const list = [...(prev.customFields?.[section] || [])]
+      list.push({
+        id: `cf_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`,
+        label: '',
+        value: '',
+      })
+      return {
+        ...prev,
+        customFields: { ...(prev.customFields || {}), [section]: list },
+      }
+    })
+  }
+
+  const updateCustomField = (section, id, field, value) => {
+    setData((prev) => {
+      const list = (prev.customFields?.[section] || []).map((cf) =>
+        cf.id === id ? { ...cf, [field]: value } : cf
+      )
+      return {
+        ...prev,
+        customFields: { ...(prev.customFields || {}), [section]: list },
+      }
+    })
+  }
+
+  const removeCustomField = (section, id) => {
+    setData((prev) => {
+      const list = (prev.customFields?.[section] || []).filter((cf) => cf.id !== id)
+      return {
+        ...prev,
+        customFields: { ...(prev.customFields || {}), [section]: list },
+      }
+    })
+  }
+
   const handleGeneratePDF = async () => {
     if (pdfBusy) return
     setPdfBusy(true)
@@ -141,6 +184,9 @@ function App() {
               addSibling={addSibling}
               updateSibling={updateSibling}
               removeSibling={removeSibling}
+              addCustomField={addCustomField}
+              updateCustomField={updateCustomField}
+              removeCustomField={removeCustomField}
             />
           </div>
 
