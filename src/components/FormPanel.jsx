@@ -11,12 +11,22 @@ const sections = [
   { key: 'contact', icon: '📞' },
 ]
 
-export default function FormPanel({ lang, data, photo, setPhoto, updateField, updateSectionTitle }) {
+export default function FormPanel({
+  lang,
+  data,
+  photo,
+  setPhoto,
+  updateField,
+  updateSectionTitle,
+  addSibling,
+  updateSibling,
+  removeSibling,
+}) {
   return (
     <div className="space-y-5">
       <div className="bg-white rounded-2xl shadow-sm border border-purple-100 p-5">
         <h2 className="text-lg font-semibold text-primary-800 mb-3 font-devanagari">
-          {lang === 'mr' ? 'फोटो' : 'Photo'}
+          {lang === 'mr' ? 'फोटो (पर्यायी)' : 'Photo (Optional)'}
         </h2>
         <PhotoUpload photo={photo} setPhoto={setPhoto} lang={lang} />
       </div>
@@ -28,22 +38,27 @@ export default function FormPanel({ lang, data, photo, setPhoto, updateField, up
             <input
               type="text"
               value={data.sectionTitles[key][lang]}
-              onChange={(e) => updateSectionTitle(key, { ...data.sectionTitles[key], [lang]: e.target.value })}
+              onChange={(e) =>
+                updateSectionTitle(key, {
+                  ...data.sectionTitles[key],
+                  [lang]: e.target.value,
+                })
+              }
               className="text-lg font-semibold text-primary-800 bg-transparent border-b border-transparent hover:border-primary-200 focus:border-primary-400 outline-none w-full font-devanagari"
             />
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            {Object.keys(data[key]).map((field) => {
-              const isFullWidth = ['about', 'siblings', 'kundaliNotes', 'otherExpectations', 'address'].includes(field)
-              const label = labels[key][field]?.[lang] || field
+          <div className="space-y-4">
+            {Object.keys(data[key] || {}).map((field) => {
+              const isTextarea = ['about', 'kundaliNotes', 'otherExpectations', 'address'].includes(field)
+              const label = labels[key]?.[field]?.[lang] || field
 
               return (
-                <div key={field} className={isFullWidth ? 'sm:col-span-2' : ''}>
+                <div key={field}>
                   <label className="block text-sm font-medium text-gray-700 mb-1 font-devanagari">
                     {label}
                   </label>
-                  {isFullWidth ? (
+                  {isTextarea ? (
                     <textarea
                       rows={3}
                       value={data[key][field]}
@@ -64,6 +79,89 @@ export default function FormPanel({ lang, data, photo, setPhoto, updateField, up
               )
             })}
           </div>
+
+          {key === 'family' && (
+            <div className="mt-6 pt-4 border-t border-purple-100">
+              <div className="flex items-center justify-between mb-3">
+                <h3 className="text-base font-semibold text-primary-800 font-devanagari">
+                  {lang === 'mr' ? 'भाऊ-बहीण' : 'Siblings'}
+                </h3>
+                <button
+                  type="button"
+                  onClick={addSibling}
+                  className="px-3 py-1.5 text-sm bg-primary-50 text-primary-700 rounded-lg hover:bg-primary-100 transition font-medium"
+                >
+                  {lang === 'mr' ? '+ जोडा' : '+ Add'}
+                </button>
+              </div>
+
+              {(data.siblings || []).length === 0 && (
+                <p className="text-sm text-gray-500 font-devanagari">
+                  {lang === 'mr' ? 'कोणतेही भाऊ-बहीण जोडलेले नाहीत' : 'No siblings added yet'}
+                </p>
+              )}
+
+              <div className="space-y-4">
+                {(data.siblings || []).map((sib, index) => (
+                  <div
+                    key={index}
+                    className="p-3 bg-purple-50/50 rounded-xl border border-purple-100 space-y-3"
+                  >
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm font-medium text-primary-700">
+                        {lang === 'mr' ? `भाऊ/बहीण ${index + 1}` : `Sibling ${index + 1}`}
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => removeSibling(index)}
+                        className="text-red-500 hover:text-red-700 text-sm"
+                      >
+                        {lang === 'mr' ? 'हटवा' : 'Remove'}
+                      </button>
+                    </div>
+                    <div className="space-y-3">
+                      <div>
+                        <label className="block text-xs font-medium text-gray-600 mb-1 font-devanagari">
+                          {labels.sibling.name[lang]}
+                        </label>
+                        <input
+                          type="text"
+                          value={sib.name}
+                          onChange={(e) => updateSibling(index, 'name', e.target.value)}
+                          className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary-300 outline-none text-sm font-devanagari"
+                          placeholder={labels.sibling.name[lang]}
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-xs font-medium text-gray-600 mb-1 font-devanagari">
+                          {labels.sibling.relation[lang]}
+                        </label>
+                        <input
+                          type="text"
+                          value={sib.relation}
+                          onChange={(e) => updateSibling(index, 'relation', e.target.value)}
+                          className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary-300 outline-none text-sm font-devanagari"
+                          placeholder={lang === 'mr' ? 'उदा. मोठा भाऊ / धाकटी बहीण' : 'e.g. Elder Brother / Younger Sister'}
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-xs font-medium text-gray-600 mb-1 font-devanagari">
+                          {labels.sibling.maritalStatus[lang]}
+                        </label>
+                        <input
+                          type="text"
+                          value={sib.maritalStatus}
+                          onChange={(e) => updateSibling(index, 'maritalStatus', e.target.value)}
+                          className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary-300 outline-none text-sm font-devanagari"
+                          placeholder={lang === 'mr' ? 'अविवाहित / विवाहित' : 'Unmarried / Married'}
+                        />
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
       ))}
     </div>
