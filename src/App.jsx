@@ -3,6 +3,7 @@ import Header, { levelToScale } from './components/Header'
 import FormPanel from './components/FormPanel'
 import PreviewPanel from './components/PreviewPanel'
 import PreviewModal from './components/PreviewModal'
+import PdfCapture from './components/PdfCapture'
 import TemplateSelector from './components/TemplateSelector'
 import { defaultData } from './data/defaultData'
 import { generatePDF } from './utils/pdfGenerator'
@@ -15,8 +16,8 @@ function App() {
   const [showTemplateModal, setShowTemplateModal] = useState(false)
   const [showPreviewModal, setShowPreviewModal] = useState(false)
   const [fontLevel, setFontLevel] = useState(0)
-  const previewRef = useRef(null)
-  const modalCaptureRef = useRef(null)
+  const [pdfBusy, setPdfBusy] = useState(false)
+  const pdfRef = useRef(null)
 
   const fontScale = levelToScale(fontLevel)
 
@@ -92,17 +93,17 @@ function App() {
   }
 
   const handleGeneratePDF = async () => {
-    const el = modalCaptureRef.current || previewRef.current
-    if (!el) {
-      setShowPreviewModal(true)
-      setTimeout(async () => {
-        if (modalCaptureRef.current) {
-          await generatePDF(modalCaptureRef.current, selectedTemplate, lang)
-        }
-      }, 350)
-      return
+    if (pdfBusy) return
+    setPdfBusy(true)
+    try {
+      if (!pdfRef.current) {
+        alert(lang === 'mr' ? 'PDF तयार करू शकत नाही' : 'Cannot generate PDF')
+        return
+      }
+      await generatePDF(pdfRef.current, selectedTemplate, lang)
+    } finally {
+      setPdfBusy(false)
     }
-    await generatePDF(el, selectedTemplate, lang)
   }
 
   const handleReset = () => {
@@ -145,7 +146,6 @@ function App() {
 
           <div className="hidden lg:block lg:sticky lg:top-24 h-fit">
             <PreviewPanel
-              ref={previewRef}
               lang={lang}
               data={data}
               photo={photo}
@@ -184,14 +184,26 @@ function App() {
           photo={photo}
           template={selectedTemplate}
           fontScale={fontScale}
-          captureRef={modalCaptureRef}
           onClose={() => setShowPreviewModal(false)}
-          onDownloadPDF={async () => {
-            if (modalCaptureRef.current) {
-              await generatePDF(modalCaptureRef.current, selectedTemplate, lang)
-            }
-          }}
+          onDownloadPDF={handleGeneratePDF}
         />
+      )}
+
+      <PdfCapture
+        ref={pdfRef}
+        lang={lang}
+        data={data}
+        photo={photo}
+        template={selectedTemplate}
+        fontScale={fontScale}
+      />
+
+      {pdfBusy && (
+        <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/40 no-print">
+          <div className="bg-white rounded-xl px-6 py-4 shadow-lg font-devanagari text-gray-800">
+            {lang === 'mr' ? 'PDF तयार होत आहे…' : 'Generating PDF…'}
+          </div>
+        </div>
       )}
 
       <footer className="text-center py-6 text-sm text-gray-500 no-print pb-24 lg:pb-6">
