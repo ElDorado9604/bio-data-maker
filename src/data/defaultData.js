@@ -55,7 +55,15 @@ export const defaultData = {
     email: '',
     address: '',
     bestTime: '',
-  }
+  },
+  customFields: {
+    personal: [],
+    family: [],
+    education: [],
+    horoscope: [],
+    expectations: [],
+    contact: [],
+  },
 }
 
 export const labels = {
@@ -111,5 +119,5 @@ export const labels = {
     email: { mr: 'ईमेल', en: 'Email' },
     address: { mr: 'पत्ता', en: 'Address' },
     bestTime: { mr: 'कॉल करण्याची योग्य वेळ', en: 'Best Time to Call' },
-  }
+  },
 }
