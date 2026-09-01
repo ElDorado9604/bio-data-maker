@@ -2,28 +2,56 @@ import React from 'react'
 
 export default function FloralTemplate({ lang, data, photo, labels }) {
   const title = lang === 'mr' ? 'विवाहासाठी बायोडाटा' : 'Marriage Biodata'
+  const siblingLabel = lang === 'mr' ? 'भाऊ-बहीण' : 'Siblings'
+
+  const renderField = (label, value) => {
+    if (!value || !String(value).trim()) return null
+    return (
+      <div className="mb-2 text-sm">
+        <span className="font-semibold text-fuchsia-900 font-devanagari">{label}:</span>{' '}
+        <span className="text-gray-800 font-devanagari">{value}</span>
+      </div>
+    )
+  }
 
   const renderSection = (sectionKey) => {
     const sectionData = data[sectionKey]
+    if (!sectionData) return null
     const titleObj = data.sectionTitles[sectionKey]
-    const fields = Object.entries(sectionData).filter(([, v]) => v && v.trim())
+    const fields = Object.entries(sectionData).filter(([, v]) => v && String(v).trim())
     if (fields.length === 0) return null
-
     return (
       <div key={sectionKey} className="mb-4">
         <h3 className="text-base font-bold text-fuchsia-800 border-b border-fuchsia-300 pb-1 mb-2 font-devanagari">
           ✿ {titleObj[lang]}
         </h3>
-        <div className="grid grid-cols-2 gap-x-4 gap-y-1.5 text-sm">
-          {fields.map(([field, value]) => (
-            <div key={field} className={['about', 'siblings', 'kundaliNotes', 'otherExpectations', 'address'].includes(field) ? 'col-span-2' : ''}>
-              <span className="font-semibold text-fuchsia-900 font-devanagari">
-                {labels[sectionKey][field]?.[lang] || field}:
-              </span>{' '}
-              <span className="text-gray-800 font-devanagari">{value}</span>
-            </div>
-          ))}
+        <div>
+          {fields.map(([field, value]) =>
+            renderField(labels[sectionKey][field]?.[lang] || field, value)
+          )}
         </div>
+      </div>
+    )
+  }
+
+  const renderSiblings = () => {
+    const valid = (data.siblings || []).filter((s) => s.name || s.relation || s.maritalStatus)
+    if (valid.length === 0) return null
+    return (
+      <div className="mb-4">
+        <h3 className="text-base font-bold text-fuchsia-800 border-b border-fuchsia-300 pb-1 mb-2 font-devanagari">
+          ✿ {siblingLabel}
+        </h3>
+        {valid.map((s, i) => (
+          <div key={i} className="mb-2 text-sm font-devanagari">
+            <span className="font-semibold text-fuchsia-900">
+              {lang === 'mr' ? `भाऊ/बहीण ${i + 1}` : `Sibling ${i + 1}`}:
+            </span>{' '}
+            <span className="text-gray-800">
+              {[s.name, s.relation, s.maritalStatus].filter(Boolean).join(' — ')}
+            </span>
+          </div>
+        ))}
       </div>
     )
   }
@@ -41,23 +69,19 @@ export default function FloralTemplate({ lang, data, photo, labels }) {
           <h1 className="text-2xl font-bold text-fuchsia-950 mt-1">{title}</h1>
         </div>
 
-        <div className="flex gap-5 mb-5 items-start">
-          {photo && (
-            <img src={photo} alt="Profile" className="w-32 h-40 object-cover rounded-lg border-2 border-fuchsia-300 shadow flex-shrink-0" />
-          )}
-          <div className="flex-1">
-            {data.personal.fullName && (
-              <h2 className="text-xl font-bold text-fuchsia-950 mb-2">{data.personal.fullName}</h2>
-            )}
-            <div className="text-sm space-y-1">
-              {data.personal.dob && <p><b>{labels.personal.dob[lang]}:</b> {data.personal.dob}</p>}
-              {data.personal.height && <p><b>{labels.personal.height[lang]}:</b> {data.personal.height}</p>}
-              {data.horoscope.nakshatra && <p><b>{labels.horoscope.nakshatra[lang]}:</b> {data.horoscope.nakshatra}</p>}
-            </div>
+        {photo && (
+          <div className="flex justify-center mb-5">
+            <img src={photo} alt="Profile" className="w-28 h-36 object-cover rounded-lg border-2 border-fuchsia-300 shadow" />
           </div>
-        </div>
+        )}
 
-        {['personal', 'family', 'education', 'horoscope', 'expectations', 'contact'].map(renderSection)}
+        {renderSection('personal')}
+        {renderSection('family')}
+        {renderSiblings()}
+        {renderSection('education')}
+        {renderSection('horoscope')}
+        {renderSection('expectations')}
+        {renderSection('contact')}
       </div>
     </div>
   )

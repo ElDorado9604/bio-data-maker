@@ -2,29 +2,58 @@ import React from 'react'
 
 export default function MinimalHinduTemplate({ lang, data, photo, labels }) {
   const title = lang === 'mr' ? 'विवाहासाठी बायोडाटा' : 'Marriage Biodata'
+  const siblingLabel = lang === 'mr' ? 'भाऊ-बहीण' : 'Siblings'
+
+  const renderField = (label, value) => {
+    if (!value || !String(value).trim()) return null
+    return (
+      <div className="mb-2.5 text-sm">
+        <div className="font-medium text-gray-600 font-devanagari text-xs">{label}</div>
+        <div className="text-gray-900 font-devanagari">{value}</div>
+      </div>
+    )
+  }
 
   const renderSection = (sectionKey) => {
     const sectionData = data[sectionKey]
+    if (!sectionData) return null
     const titleObj = data.sectionTitles[sectionKey]
-    const fields = Object.entries(sectionData).filter(([, v]) => v && v.trim())
+    const fields = Object.entries(sectionData).filter(([, v]) => v && String(v).trim())
     if (fields.length === 0) return null
-
     return (
       <div key={sectionKey} className="mb-5">
         <h3 className="text-sm font-bold text-orange-700 uppercase tracking-wide mb-2 flex items-center gap-2 font-devanagari">
           <span className="w-6 h-0.5 bg-orange-500"></span>
           {titleObj[lang]}
         </h3>
-        <div className="grid grid-cols-2 gap-x-6 gap-y-1.5 text-sm">
-          {fields.map(([field, value]) => (
-            <div key={field} className={['about', 'siblings', 'kundaliNotes', 'otherExpectations', 'address'].includes(field) ? 'col-span-2' : ''}>
-              <span className="font-medium text-gray-600 font-devanagari">
-                {labels[sectionKey][field]?.[lang] || field}
-              </span>
-              <div className="text-gray-900 font-devanagari">{value}</div>
-            </div>
-          ))}
+        <div>
+          {fields.map(([field, value]) =>
+            renderField(labels[sectionKey][field]?.[lang] || field, value)
+          )}
         </div>
+      </div>
+    )
+  }
+
+  const renderSiblings = () => {
+    const valid = (data.siblings || []).filter((s) => s.name || s.relation || s.maritalStatus)
+    if (valid.length === 0) return null
+    return (
+      <div className="mb-5">
+        <h3 className="text-sm font-bold text-orange-700 uppercase tracking-wide mb-2 flex items-center gap-2 font-devanagari">
+          <span className="w-6 h-0.5 bg-orange-500"></span>
+          {siblingLabel}
+        </h3>
+        {valid.map((s, i) => (
+          <div key={i} className="mb-2.5 text-sm font-devanagari">
+            <div className="font-medium text-gray-600 text-xs">
+              {lang === 'mr' ? `भाऊ/बहीण ${i + 1}` : `Sibling ${i + 1}`}
+            </div>
+            <div className="text-gray-900">
+              {[s.name, s.relation, s.maritalStatus].filter(Boolean).join(' — ')}
+            </div>
+          </div>
+        ))}
       </div>
     )
   }
@@ -38,25 +67,19 @@ export default function MinimalHinduTemplate({ lang, data, photo, labels }) {
         <h1 className="text-2xl font-bold text-gray-900 mt-1">{title}</h1>
       </div>
 
-      <div className="flex gap-6 mb-6 items-start">
-        {photo && (
-          <img src={photo} alt="Profile" className="w-28 h-36 object-cover rounded-full border-2 border-orange-300 shadow-sm flex-shrink-0" />
-        )}
-        <div className="flex-1 pt-2">
-          {data.personal.fullName && (
-            <h2 className="text-xl font-bold text-gray-900 mb-2">{data.personal.fullName}</h2>
-          )}
-          <div className="text-sm text-gray-700 space-y-0.5">
-            {data.personal.dob && <p>{data.personal.dob}</p>}
-            {data.personal.height && <p>{data.personal.height}</p>}
-            {(data.personal.religion || data.personal.caste) && (
-              <p>{[data.personal.religion, data.personal.caste].filter(Boolean).join(' • ')}</p>
-            )}
-          </div>
+      {photo && (
+        <div className="flex justify-center mb-6">
+          <img src={photo} alt="Profile" className="w-28 h-36 object-cover rounded-full border-2 border-orange-300 shadow-sm" />
         </div>
-      </div>
+      )}
 
-      {['personal', 'family', 'education', 'horoscope', 'expectations', 'contact'].map(renderSection)}
+      {renderSection('personal')}
+      {renderSection('family')}
+      {renderSiblings()}
+      {renderSection('education')}
+      {renderSection('horoscope')}
+      {renderSection('expectations')}
+      {renderSection('contact')}
 
       <div className="h-1.5 bg-gradient-to-r from-orange-500 via-amber-400 to-orange-500 mt-8"></div>
     </div>
