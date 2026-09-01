@@ -4,89 +4,89 @@ export default function ClassicTemplate({ lang, data, photo, labels }) {
   const title = lang === 'mr' ? 'विवाहासाठी बायोडाटा' : 'Marriage Biodata'
   const siblingLabel = lang === 'mr' ? 'भाऊ-बहीण' : 'Siblings'
 
-  const renderField = (label, value) => {
-    if (!value || !String(value).trim()) return null
-    return (
-      <div className="mb-2 text-sm">
-        <span className="font-semibold text-gray-700 font-devanagari">{label}:</span>{' '}
-        <span className="text-gray-800 font-devanagari">{value}</span>
-      </div>
-    )
-  }
-
-  const renderSection = (sectionKey) => {
+  const rows = (sectionKey) => {
     const sectionData = data[sectionKey]
-    if (!sectionData) return null
-    const titleObj = data.sectionTitles[sectionKey]
-    const fields = Object.entries(sectionData).filter(([, v]) => v && String(v).trim())
-    if (fields.length === 0) return null
-
-    return (
-      <div key={sectionKey} className="mb-4">
-        <h3 className="text-base font-bold text-purple-800 border-b-2 border-purple-300 pb-1 mb-2 font-devanagari">
-          {titleObj[lang]}
-        </h3>
-        <div>
-          {fields.map(([field, value]) =>
-            renderField(labels[sectionKey][field]?.[lang] || field, value)
-          )}
-        </div>
-      </div>
-    )
+    if (!sectionData) return []
+    return Object.entries(sectionData)
+      .filter(([, v]) => v && String(v).trim())
+      .map(([field, value]) => ({
+        label: labels[sectionKey]?.[field]?.[lang] || field,
+        value,
+      }))
   }
 
-  const renderSiblings = () => {
-    const valid = (data.siblings || []).filter(
-      (s) => s.name || s.relation || s.maritalStatus
-    )
-    if (valid.length === 0) return null
+  const FieldTable = ({ items }) => (
+    <div className="space-y-1.5">
+      {items.map(({ label, value }, i) => (
+        <div key={i} className="grid grid-cols-[140px_12px_1fr] gap-0 text-[13px] leading-relaxed">
+          <span className="font-medium text-gray-700 font-devanagari">{label}</span>
+          <span className="text-gray-500 text-center">:</span>
+          <span className="text-gray-900 font-devanagari">{value}</span>
+        </div>
+      ))}
+    </div>
+  )
 
+  const Section = ({ sectionKey, color = 'text-purple-800', border = 'border-purple-300' }) => {
+    const items = rows(sectionKey)
+    if (items.length === 0) return null
     return (
       <div className="mb-4">
-        <h3 className="text-base font-bold text-purple-800 border-b-2 border-purple-300 pb-1 mb-2 font-devanagari">
-          {siblingLabel}
+        <h3 className={`text-[15px] font-bold ${color} border-b ${border} pb-1 mb-2 font-devanagari`}>
+          {data.sectionTitles[sectionKey][lang]}
         </h3>
-        {valid.map((s, i) => (
-          <div key={i} className="mb-2 text-sm font-devanagari">
-            <span className="font-semibold text-gray-700">
-              {lang === 'mr' ? `भाऊ/बहीण ${i + 1}` : `Sibling ${i + 1}`}:
-            </span>{' '}
-            <span className="text-gray-800">
-              {[s.name, s.relation, s.maritalStatus].filter(Boolean).join(' — ')}
-            </span>
-          </div>
-        ))}
+        <FieldTable items={items} />
       </div>
     )
   }
 
+  const siblingItems = (data.siblings || [])
+    .filter((s) => s.name || s.relation || s.maritalStatus)
+    .map((s, i) => ({
+      label: lang === 'mr' ? `भाऊ/बहीण ${i + 1}` : `Sibling ${i + 1}`,
+      value: [s.name, s.relation, s.maritalStatus].filter(Boolean).join(' — '),
+    }))
+
   return (
-    <div className="p-8 font-devanagari text-gray-900" style={{ minHeight: '297mm' }}>
-      <div className="border-4 border-double border-purple-700 p-6 h-full">
-        <div className="text-center mb-5">
-          <p className="text-purple-800 font-semibold text-lg tracking-wide">
+    <div className="p-7 font-devanagari text-gray-900" style={{ minHeight: '297mm' }}>
+      <div className="border-4 border-double border-purple-700 p-5 h-full">
+        <div className="text-center mb-4">
+          <p className="text-purple-800 font-semibold tracking-wide text-sm">
             || ॐ गणेशाय नमः ||
           </p>
-          <h1 className="text-2xl font-bold text-purple-900 mt-2">{title}</h1>
+          <h1 className="text-xl font-bold text-purple-900 mt-1">{title}</h1>
         </div>
 
-        {photo && (
-          <div className="flex justify-center mb-5">
-            <img
-              src={photo}
-              alt="Profile"
-              className="w-28 h-36 object-cover rounded border-2 border-purple-300 shadow-sm"
-            />
+        <div className="flex gap-4 mb-4">
+          <div className="flex-1 min-w-0">
+            <Section sectionKey="personal" />
+          </div>
+          {photo && (
+            <div className="flex-shrink-0">
+              <img
+                src={photo}
+                alt="Profile"
+                className="w-28 h-36 object-cover rounded border-2 border-purple-300 shadow-sm"
+              />
+            </div>
+          )}
+        </div>
+
+        <Section sectionKey="family" />
+
+        {siblingItems.length > 0 && (
+          <div className="mb-4">
+            <h3 className="text-[15px] font-bold text-purple-800 border-b border-purple-300 pb-1 mb-2 font-devanagari">
+              {siblingLabel}
+            </h3>
+            <FieldTable items={siblingItems} />
           </div>
         )}
 
-        {renderSection('personal')}
-        {renderSection('family')}
-        {renderSiblings()}
-        {renderSection('education')}
-        {renderSection('horoscope')}
-        {renderSection('expectations')}
-        {renderSection('contact')}
+        <Section sectionKey="education" />
+        <Section sectionKey="horoscope" />
+        <Section sectionKey="expectations" />
+        <Section sectionKey="contact" />
       </div>
     </div>
   )
