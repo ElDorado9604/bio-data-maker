@@ -60,19 +60,16 @@ export default function ClassicTemplate({ lang, data, photo, labels, fontScale =
           <h1 className="text-[1.25em] font-bold text-purple-900 mt-1">{title}</h1>
         </div>
 
-        <div className="flex gap-4 mb-4">
-          <div className="flex-1 min-w-0">
-            <Section sectionKey="personal" />
-          </div>
+        <div className="mb-4 overflow-hidden">
           {photo && (
-            <div className="flex-shrink-0">
-              <img
-                src={photo}
-                alt="Profile"
-                className="w-28 h-36 object-cover rounded border-2 border-purple-300 shadow-sm"
-              />
-            </div>
+            <img
+              src={photo}
+              alt="Profile"
+              className="float-right ml-4 mb-2 w-28 h-36 object-cover rounded border-2 border-purple-300 shadow-sm"
+            />
           )}
+          <Section sectionKey="personal" />
+          <div className="clear-both" />
         </div>
 
         <Section sectionKey="family" />
