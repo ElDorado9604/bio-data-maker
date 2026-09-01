@@ -18,8 +18,8 @@ export default function TraditionalOmTemplate({ lang, data, photo, labels, fontS
   const FieldTable = ({ items }) => (
     <div className="space-y-2">
       {items.map(({ label, value }, i) => (
-        <div key={i} className="grid grid-cols-[minmax(110px,38%)_10px_1fr] gap-0 text-[0.95em] leading-snug">
-          <span className="font-medium text-red-900 font-devanagari">{label}</span>
+        <div key={i} className="grid grid-cols-[auto_8px_1fr] gap-x-1 text-[0.95em] leading-snug">
+          <span className="font-medium text-red-900 font-devanagari whitespace-nowrap">{label}</span>
           <span className="text-amber-700 text-center">:</span>
           <span className="text-gray-900 font-devanagari">{value}</span>
         </div>
@@ -66,7 +66,7 @@ export default function TraditionalOmTemplate({ lang, data, photo, labels, fontS
               <img
                 src={photo}
                 alt="Profile"
-                className="float-right ml-4 mb-2 w-28 h-36 object-cover border-2 border-red-800 shadow"
+                className="float-right ml-3 mb-3 w-28 h-36 object-cover border-2 border-red-800 shadow"
               />
             )}
             <Section sectionKey="personal" />
