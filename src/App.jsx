@@ -19,7 +19,17 @@ function App() {
     if (saved) {
       try {
         const parsed = JSON.parse(saved)
-        setData(parsed.data || defaultData)
+        const loaded = parsed.data || defaultData
+        if (typeof loaded.siblings === 'string') {
+          loaded.siblings = []
+        }
+        if (!Array.isArray(loaded.siblings)) {
+          loaded.siblings = []
+        }
+        if (loaded.family && 'siblings' in loaded.family) {
+          delete loaded.family.siblings
+        }
+        setData(loaded)
         setSelectedTemplate(parsed.template || 'classic')
         if (parsed.photo) setPhoto(parsed.photo)
       } catch (e) {
@@ -59,6 +69,28 @@ function App() {
     }))
   }
 
+  const addSibling = () => {
+    setData(prev => ({
+      ...prev,
+      siblings: [...prev.siblings, { name: '', relation: '', maritalStatus: '' }]
+    }))
+  }
+
+  const updateSibling = (index, field, value) => {
+    setData(prev => {
+      const siblings = [...prev.siblings]
+      siblings[index] = { ...siblings[index], [field]: value }
+      return { ...prev, siblings }
+    })
+  }
+
+  const removeSibling = (index) => {
+    setData(prev => ({
+      ...prev,
+      siblings: prev.siblings.filter((_, i) => i !== index)
+    }))
+  }
+
   const handleGeneratePDF = async () => {
     if (!previewRef.current) return
     await generatePDF(previewRef.current, selectedTemplate, lang)
@@ -74,8 +106,8 @@ function App() {
 
   return (
     <div className="min-h-screen">
-      <Header 
-        lang={lang} 
+      <Header
+        lang={lang}
         setLang={setLang}
         onGeneratePDF={handleGeneratePDF}
         onOpenTemplates={() => setShowTemplateModal(true)}
@@ -92,6 +124,9 @@ function App() {
               setPhoto={setPhoto}
               updateField={updateField}
               updateSectionTitle={updateSectionTitle}
+              addSibling={addSibling}
+              updateSibling={updateSibling}
+              removeSibling={removeSibling}
             />
           </div>
 
