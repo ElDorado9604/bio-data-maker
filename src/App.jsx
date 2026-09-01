@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react'
-import Header from './components/Header'
+import Header, { levelToScale } from './components/Header'
 import FormPanel from './components/FormPanel'
 import PreviewPanel from './components/PreviewPanel'
 import PreviewModal from './components/PreviewModal'
@@ -14,9 +14,11 @@ function App() {
   const [photo, setPhoto] = useState(null)
   const [showTemplateModal, setShowTemplateModal] = useState(false)
   const [showPreviewModal, setShowPreviewModal] = useState(false)
-  const [fontScale, setFontScale] = useState(1.05)
+  const [fontLevel, setFontLevel] = useState(0)
   const previewRef = useRef(null)
   const modalCaptureRef = useRef(null)
+
+  const fontScale = levelToScale(fontLevel)
 
   useEffect(() => {
     const saved = localStorage.getItem('biodata-draft')
@@ -30,7 +32,13 @@ function App() {
         setData(loaded)
         setSelectedTemplate(parsed.template || 'classic')
         if (parsed.photo) setPhoto(parsed.photo)
-        if (parsed.fontScale) setFontScale(parsed.fontScale)
+        if (typeof parsed.fontLevel === 'number') {
+          setFontLevel(parsed.fontLevel)
+        } else if (typeof parsed.fontScale === 'number') {
+          if (parsed.fontScale <= 0.95) setFontLevel(-1)
+          else if (parsed.fontScale >= 1.15) setFontLevel(2)
+          else setFontLevel(0)
+        }
       } catch (e) {
         console.warn('Could not load draft')
       }
@@ -41,11 +49,11 @@ function App() {
     const timer = setTimeout(() => {
       localStorage.setItem(
         'biodata-draft',
-        JSON.stringify({ data, template: selectedTemplate, photo, fontScale })
+        JSON.stringify({ data, template: selectedTemplate, photo, fontLevel })
       )
     }, 800)
     return () => clearTimeout(timer)
-  }, [data, selectedTemplate, photo, fontScale])
+  }, [data, selectedTemplate, photo, fontLevel])
 
   const updateField = (section, field, value) => {
     setData((prev) => ({
@@ -91,7 +99,7 @@ function App() {
         if (modalCaptureRef.current) {
           await generatePDF(modalCaptureRef.current, selectedTemplate, lang)
         }
-      }, 300)
+      }, 350)
       return
     }
     await generatePDF(el, selectedTemplate, lang)
@@ -101,7 +109,7 @@ function App() {
     if (window.confirm(lang === 'mr' ? 'सर्व माहिती रीसेट करायची आहे का?' : 'Reset all data?')) {
       setData(defaultData)
       setPhoto(null)
-      setFontScale(1.05)
+      setFontLevel(0)
       localStorage.removeItem('biodata-draft')
     }
   }
@@ -111,8 +119,8 @@ function App() {
       <Header
         lang={lang}
         setLang={setLang}
-        fontScale={fontScale}
-        setFontScale={setFontScale}
+        fontLevel={fontLevel}
+        setFontLevel={setFontLevel}
         onOpenPreview={() => setShowPreviewModal(true)}
         onOpenTemplates={() => setShowTemplateModal(true)}
         onGeneratePDF={handleGeneratePDF}
