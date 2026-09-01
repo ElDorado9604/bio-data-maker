@@ -16,13 +16,16 @@ export default function FloralTemplate({ lang, data, photo, labels, fontScale = 
   }
 
   const FieldTable = ({ items }) => (
-    <div className="space-y-2">
+    <div
+      className="grid gap-x-1.5 gap-y-2 text-[0.95em] leading-snug"
+      style={{ gridTemplateColumns: 'max-content auto 1fr' }}
+    >
       {items.map(({ label, value }, i) => (
-        <div key={i} className="grid grid-cols-[auto_8px_1fr] gap-x-1 text-[0.95em] leading-snug">
-          <span className="font-medium text-fuchsia-900 font-devanagari whitespace-nowrap">{label}</span>
+        <React.Fragment key={i}>
+          <span className="font-medium text-fuchsia-900 font-devanagari">{label}</span>
           <span className="text-fuchsia-500 text-center">:</span>
           <span className="text-gray-900 font-devanagari">{value}</span>
-        </div>
+        </React.Fragment>
       ))}
     </div>
   )
