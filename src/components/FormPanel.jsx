@@ -1,6 +1,5 @@
 import React from 'react'
 import { labels } from '../data/defaultData'
-import PhotoUpload from './PhotoUpload'
 
 const sections = [
   { key: 'personal', icon: '👤' },
@@ -14,10 +13,6 @@ const sections = [
 export default function FormPanel({
   lang,
   data,
-  photo,
-  setPhoto,
-  photoSize,
-  setPhotoSize,
   updateField,
   updateSectionTitle,
   addSibling,
@@ -29,19 +24,6 @@ export default function FormPanel({
 }) {
   return (
     <div className="space-y-5">
-      <div className="bg-white rounded-2xl shadow-sm border border-purple-100 p-5">
-        <h2 className="text-lg font-semibold text-primary-800 mb-3 font-devanagari">
-          {lang === 'mr' ? 'फोटो (पर्यायी)' : 'Photo (Optional)'}
-        </h2>
-        <PhotoUpload
-          photo={photo}
-          setPhoto={setPhoto}
-          lang={lang}
-          photoSize={photoSize}
-          setPhotoSize={setPhotoSize}
-        />
-      </div>
-
       {sections.map(({ key, icon }) => {
         const customList = data.customFields?.[key] || []
 
