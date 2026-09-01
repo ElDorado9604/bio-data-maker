@@ -13,6 +13,7 @@ function App() {
   const [data, setData] = useState(defaultData)
   const [selectedTemplate, setSelectedTemplate] = useState('classic')
   const [photo, setPhoto] = useState(null)
+  const [photoSize, setPhotoSize] = useState('md')
   const [showTemplateModal, setShowTemplateModal] = useState(false)
   const [showPreviewModal, setShowPreviewModal] = useState(false)
   const [fontLevel, setFontLevel] = useState(0)
@@ -39,6 +40,7 @@ function App() {
         setData(loaded)
         setSelectedTemplate(parsed.template || 'classic')
         if (parsed.photo) setPhoto(parsed.photo)
+        if (parsed.photoSize) setPhotoSize(parsed.photoSize)
         if (typeof parsed.fontLevel === 'number') {
           setFontLevel(parsed.fontLevel)
         } else if (typeof parsed.fontScale === 'number') {
@@ -56,11 +58,11 @@ function App() {
     const timer = setTimeout(() => {
       localStorage.setItem(
         'biodata-draft',
-        JSON.stringify({ data, template: selectedTemplate, photo, fontLevel })
+        JSON.stringify({ data, template: selectedTemplate, photo, photoSize, fontLevel })
       )
     }, 800)
     return () => clearTimeout(timer)
-  }, [data, selectedTemplate, photo, fontLevel])
+  }, [data, selectedTemplate, photo, photoSize, fontLevel])
 
   const updateField = (section, field, value) => {
     setData((prev) => ({
@@ -153,6 +155,7 @@ function App() {
     if (window.confirm(lang === 'mr' ? 'सर्व माहिती रीसेट करायची आहे का?' : 'Reset all data?')) {
       setData(defaultData)
       setPhoto(null)
+      setPhotoSize('md')
       setFontLevel(0)
       localStorage.removeItem('biodata-draft')
     }
@@ -179,6 +182,8 @@ function App() {
               data={data}
               photo={photo}
               setPhoto={setPhoto}
+              photoSize={photoSize}
+              setPhotoSize={setPhotoSize}
               updateField={updateField}
               updateSectionTitle={updateSectionTitle}
               addSibling={addSibling}
@@ -195,6 +200,7 @@ function App() {
               lang={lang}
               data={data}
               photo={photo}
+              photoSize={photoSize}
               template={selectedTemplate}
               fontScale={fontScale}
             />
@@ -228,6 +234,7 @@ function App() {
           lang={lang}
           data={data}
           photo={photo}
+          photoSize={photoSize}
           template={selectedTemplate}
           fontScale={fontScale}
           onClose={() => setShowPreviewModal(false)}
@@ -240,6 +247,7 @@ function App() {
         lang={lang}
         data={data}
         photo={photo}
+        photoSize={photoSize}
         template={selectedTemplate}
         fontScale={fontScale}
       />
