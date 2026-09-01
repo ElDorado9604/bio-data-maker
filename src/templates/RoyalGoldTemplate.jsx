@@ -1,19 +1,11 @@
 import React from 'react'
+import { getSectionRows } from '../utils/fieldRows'
 
 export default function RoyalGoldTemplate({ lang, data, photo, labels, fontScale = 1 }) {
   const title = lang === 'mr' ? 'विवाहासाठी बायोडाटा' : 'Marriage Biodata'
   const siblingLabel = lang === 'mr' ? 'भाऊ-बहीण' : 'Siblings'
 
-  const rows = (sectionKey) => {
-    const sectionData = data[sectionKey]
-    if (!sectionData) return []
-    return Object.entries(sectionData)
-      .filter(([, v]) => v && String(v).trim())
-      .map(([field, value]) => ({
-        label: labels[sectionKey]?.[field]?.[lang] || field,
-        value,
-      }))
-  }
+  const rows = (sectionKey) => getSectionRows(data, labels, sectionKey, lang)
 
   const FieldTable = ({ items }) => (
     <div
