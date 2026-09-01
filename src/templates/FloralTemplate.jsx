@@ -61,13 +61,16 @@ export default function FloralTemplate({ lang, data, photo, labels, fontScale = 
           <p className="text-fuchsia-800 font-semibold text-[0.9em]">|| ॐ गणेशाय नमः ||</p>
           <h1 className="text-[1.2em] font-bold text-fuchsia-950 mt-0.5">{title}</h1>
         </div>
-        <div className="flex gap-4 mb-4">
-          <div className="flex-1 min-w-0"><Section sectionKey="personal" /></div>
+        <div className="mb-4 overflow-hidden">
           {photo && (
-            <div className="flex-shrink-0">
-              <img src={photo} alt="Profile" className="w-28 h-36 object-cover rounded-lg border-2 border-fuchsia-300 shadow" />
-            </div>
+            <img
+              src={photo}
+              alt="Profile"
+              className="float-right ml-4 mb-2 w-28 h-36 object-cover rounded-lg border-2 border-fuchsia-300 shadow"
+            />
           )}
+          <Section sectionKey="personal" />
+          <div className="clear-both" />
         </div>
         <Section sectionKey="family" />
         {siblingItems.length > 0 && (

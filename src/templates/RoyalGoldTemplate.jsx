@@ -62,13 +62,16 @@ export default function RoyalGoldTemplate({ lang, data, photo, labels, fontScale
           <h1 className="text-[1.2em] font-bold text-amber-950 mt-1">{title}</h1>
           <div className="w-28 h-0.5 bg-amber-500 mx-auto mt-1.5"></div>
         </div>
-        <div className="flex gap-4 mb-4">
-          <div className="flex-1 min-w-0"><Section sectionKey="personal" /></div>
+        <div className="mb-4 overflow-hidden">
           {photo && (
-            <div className="flex-shrink-0">
-              <img src={photo} alt="Profile" className="w-28 h-36 object-cover border-2 border-amber-600 shadow" />
-            </div>
+            <img
+              src={photo}
+              alt="Profile"
+              className="float-right ml-4 mb-2 w-28 h-36 object-cover border-2 border-amber-600 shadow"
+            />
           )}
+          <Section sectionKey="personal" />
+          <div className="clear-both" />
         </div>
         <Section sectionKey="family" />
         {siblingItems.length > 0 && (
