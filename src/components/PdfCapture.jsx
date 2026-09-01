@@ -17,7 +17,7 @@ const templateMap = {
 }
 
 const PdfCapture = forwardRef(function PdfCapture(
-  { lang, data, photo, template, fontScale = 1 },
+  { lang, data, photo, photoSize = 'md', template, fontScale = 1 },
   ref
 ) {
   const TemplateComponent = templateMap[template] || ClassicTemplate
@@ -47,6 +47,7 @@ const PdfCapture = forwardRef(function PdfCapture(
           lang={lang}
           data={data}
           photo={photo}
+          photoSize={photoSize}
           labels={labels}
           fontScale={fontScale}
         />

@@ -20,6 +20,7 @@ export default function PreviewModal({
   lang,
   data,
   photo,
+  photoSize = 'md',
   template,
   fontScale = 1,
   onClose,
@@ -71,6 +72,7 @@ export default function PreviewModal({
               lang={lang}
               data={data}
               photo={photo}
+              photoSize={photoSize}
               labels={labels}
               fontScale={fontScale}
             />

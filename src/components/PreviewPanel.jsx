@@ -17,7 +17,7 @@ const templateMap = {
 }
 
 const PreviewPanel = forwardRef(function PreviewPanel(
-  { lang, data, photo, template, fontScale = 1.05 },
+  { lang, data, photo, photoSize = 'md', template, fontScale = 1.05 },
   ref
 ) {
   const TemplateComponent = templateMap[template] || ClassicTemplate
@@ -48,6 +48,7 @@ const PreviewPanel = forwardRef(function PreviewPanel(
             lang={lang}
             data={data}
             photo={photo}
+            photoSize={photoSize}
             labels={labels}
             fontScale={fontScale}
           />
