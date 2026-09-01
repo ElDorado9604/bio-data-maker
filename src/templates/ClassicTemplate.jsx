@@ -1,6 +1,6 @@
 import React from 'react'
 
-export default function ClassicTemplate({ lang, data, photo, labels }) {
+export default function ClassicTemplate({ lang, data, photo, labels, fontScale = 1 }) {
   const title = lang === 'mr' ? 'विवाहासाठी बायोडाटा' : 'Marriage Biodata'
   const siblingLabel = lang === 'mr' ? 'भाऊ-बहीण' : 'Siblings'
 
@@ -16,9 +16,9 @@ export default function ClassicTemplate({ lang, data, photo, labels }) {
   }
 
   const FieldTable = ({ items }) => (
-    <div className="space-y-1.5">
+    <div className="space-y-2">
       {items.map(({ label, value }, i) => (
-        <div key={i} className="grid grid-cols-[140px_12px_1fr] gap-0 text-[13px] leading-relaxed">
+        <div key={i} className="grid grid-cols-[minmax(110px,38%)_10px_1fr] gap-0 text-[0.95em] leading-snug">
           <span className="font-medium text-gray-700 font-devanagari">{label}</span>
           <span className="text-gray-500 text-center">:</span>
           <span className="text-gray-900 font-devanagari">{value}</span>
@@ -31,8 +31,8 @@ export default function ClassicTemplate({ lang, data, photo, labels }) {
     const items = rows(sectionKey)
     if (items.length === 0) return null
     return (
-      <div className="mb-4">
-        <h3 className={`text-[15px] font-bold ${color} border-b ${border} pb-1 mb-2 font-devanagari`}>
+      <div className="mb-5">
+        <h3 className={`text-[1.05em] font-bold ${color} border-b ${border} pb-1 mb-2 font-devanagari`}>
           {data.sectionTitles[sectionKey][lang]}
         </h3>
         <FieldTable items={items} />
@@ -51,10 +51,10 @@ export default function ClassicTemplate({ lang, data, photo, labels }) {
     <div className="p-7 font-devanagari text-gray-900" style={{ minHeight: '297mm' }}>
       <div className="border-4 border-double border-purple-700 p-5 h-full">
         <div className="text-center mb-4">
-          <p className="text-purple-800 font-semibold tracking-wide text-sm">
+          <p className="text-purple-800 font-semibold tracking-wide text-[0.95em]">
             || ॐ गणेशाय नमः ||
           </p>
-          <h1 className="text-xl font-bold text-purple-900 mt-1">{title}</h1>
+          <h1 className="text-[1.25em] font-bold text-purple-900 mt-1">{title}</h1>
         </div>
 
         <div className="flex gap-4 mb-4">
@@ -75,8 +75,8 @@ export default function ClassicTemplate({ lang, data, photo, labels }) {
         <Section sectionKey="family" />
 
         {siblingItems.length > 0 && (
-          <div className="mb-4">
-            <h3 className="text-[15px] font-bold text-purple-800 border-b border-purple-300 pb-1 mb-2 font-devanagari">
+          <div className="mb-5">
+            <h3 className="text-[1.05em] font-bold text-purple-800 border-b border-purple-300 pb-1 mb-2 font-devanagari">
               {siblingLabel}
             </h3>
             <FieldTable items={siblingItems} />
