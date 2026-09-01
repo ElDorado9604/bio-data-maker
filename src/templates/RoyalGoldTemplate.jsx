@@ -1,6 +1,6 @@
 import React from 'react'
 
-export default function RoyalGoldTemplate({ lang, data, photo, labels }) {
+export default function RoyalGoldTemplate({ lang, data, photo, labels, fontScale = 1 }) {
   const title = lang === 'mr' ? 'विवाहासाठी बायोडाटा' : 'Marriage Biodata'
   const siblingLabel = lang === 'mr' ? 'भाऊ-बहीण' : 'Siblings'
 
@@ -16,9 +16,9 @@ export default function RoyalGoldTemplate({ lang, data, photo, labels }) {
   }
 
   const FieldTable = ({ items }) => (
-    <div className="space-y-1.5">
+    <div className="space-y-2">
       {items.map(({ label, value }, i) => (
-        <div key={i} className="grid grid-cols-[140px_12px_1fr] gap-0 text-[13px] leading-relaxed">
+        <div key={i} className="grid grid-cols-[minmax(110px,38%)_10px_1fr] gap-0 text-[0.95em] leading-snug">
           <span className="font-medium text-amber-900 font-devanagari">{label}</span>
           <span className="text-amber-600 text-center">:</span>
           <span className="text-gray-900 font-devanagari">{value}</span>
@@ -31,8 +31,8 @@ export default function RoyalGoldTemplate({ lang, data, photo, labels }) {
     const items = rows(sectionKey)
     if (items.length === 0) return null
     return (
-      <div className="mb-4">
-        <h3 className="text-[15px] font-bold text-amber-900 border-b-2 border-amber-500 pb-1 mb-2 font-devanagari">
+      <div className="mb-5">
+        <h3 className="text-[1.05em] font-bold text-amber-900 border-b-2 border-amber-500 pb-1 mb-2 font-devanagari">
           {data.sectionTitles[sectionKey][lang]}
         </h3>
         <FieldTable items={items} />
@@ -54,30 +54,23 @@ export default function RoyalGoldTemplate({ lang, data, photo, labels }) {
         <div className="absolute top-2 right-2 text-amber-600 text-lg">❖</div>
         <div className="absolute bottom-2 left-2 text-amber-600 text-lg">❖</div>
         <div className="absolute bottom-2 right-2 text-amber-600 text-lg">❖</div>
-
         <div className="text-center mb-4">
-          <p className="text-amber-800 font-semibold tracking-widest text-sm">|| ॐ गणेशाय नमः ||</p>
-          <h1 className="text-xl font-bold text-amber-950 mt-1">{title}</h1>
+          <p className="text-amber-800 font-semibold tracking-widest text-[0.9em]">|| ॐ गणेशाय नमः ||</p>
+          <h1 className="text-[1.2em] font-bold text-amber-950 mt-1">{title}</h1>
           <div className="w-28 h-0.5 bg-amber-500 mx-auto mt-1.5"></div>
         </div>
-
         <div className="flex gap-4 mb-4">
-          <div className="flex-1 min-w-0">
-            <Section sectionKey="personal" />
-          </div>
+          <div className="flex-1 min-w-0"><Section sectionKey="personal" /></div>
           {photo && (
             <div className="flex-shrink-0">
               <img src={photo} alt="Profile" className="w-28 h-36 object-cover border-2 border-amber-600 shadow" />
             </div>
           )}
         </div>
-
         <Section sectionKey="family" />
         {siblingItems.length > 0 && (
-          <div className="mb-4">
-            <h3 className="text-[15px] font-bold text-amber-900 border-b-2 border-amber-500 pb-1 mb-2 font-devanagari">
-              {siblingLabel}
-            </h3>
+          <div className="mb-5">
+            <h3 className="text-[1.05em] font-bold text-amber-900 border-b-2 border-amber-500 pb-1 mb-2 font-devanagari">{siblingLabel}</h3>
             <FieldTable items={siblingItems} />
           </div>
         )}
