@@ -22,28 +22,40 @@ export async function generatePDF(element, template, lang) {
     const pdf = new jsPDF('p', 'mm', 'a4')
     const pdfWidth = pdf.internal.pageSize.getWidth()
     const pdfHeight = pdf.internal.pageSize.getHeight()
+    const margin = 4
+
+    const usableW = pdfWidth - margin * 2
+    const usableH = pdfHeight - margin * 2
 
     const imgWidth = canvas.width
     const imgHeight = canvas.height
 
-    const ratio = pdfWidth / imgWidth
-    const width = pdfWidth
-    const height = imgHeight * ratio
+    let width = usableW
+    let height = (imgHeight * usableW) / imgWidth
 
-    if (height <= pdfHeight) {
-      const y = Math.max(0, (pdfHeight - height) / 2)
-      pdf.addImage(imgData, 'JPEG', 0, y, width, height)
+    // Shrink slightly to fit one page when close — avoids mid-section page cuts
+    if (height > usableH && height <= usableH * 1.35) {
+      const fit = usableH / height
+      width *= fit
+      height = usableH
+    }
+
+    if (height <= usableH) {
+      const x = margin + (usableW - width) / 2
+      const y = margin + Math.max(0, (usableH - height) / 2)
+      pdf.addImage(imgData, 'JPEG', x, y, width, height)
     } else {
-      let remaining = height
-      let position = 0
+      const pageImgHeight = (usableH / width) * imgWidth
+      let srcY = 0
       let page = 0
-      while (remaining > 0) {
+      while (srcY < imgHeight - 2) {
         if (page > 0) pdf.addPage()
-        pdf.addImage(imgData, 'JPEG', 0, -position, width, height)
-        position += pdfHeight
-        remaining -= pdfHeight
+        const drawnH = (imgHeight * width) / imgWidth
+        const yOffset = margin - (srcY / imgHeight) * drawnH
+        pdf.addImage(imgData, 'JPEG', margin, yOffset, width, drawnH)
+        srcY += pageImgHeight
         page++
-        if (page > 5) break
+        if (page > 6) break
       }
     }
 

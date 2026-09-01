@@ -1,20 +1,33 @@
 import React from 'react'
 
+export const FONT_LEVEL_TO_SCALE = {
+  '-4': 0.72,
+  '-3': 0.78,
+  '-2': 0.84,
+  '-1': 0.90,
+  '0': 1.0,
+  '1': 1.08,
+  '2': 1.16,
+  '3': 1.24,
+  '4': 1.32,
+}
+
+export function levelToScale(level) {
+  const key = String(level)
+  return FONT_LEVEL_TO_SCALE[key] ?? 1.0
+}
+
 export default function Header({
   lang,
   setLang,
-  fontScale,
-  setFontScale,
+  fontLevel,
+  setFontLevel,
   onOpenPreview,
   onOpenTemplates,
   onGeneratePDF,
   onReset,
 }) {
-  const fontOptions = [
-    { value: 0.95, label: lang === 'mr' ? 'लहान' : 'S' },
-    { value: 1.05, label: lang === 'mr' ? 'मध्यम' : 'M' },
-    { value: 1.2, label: lang === 'mr' ? 'मोठे' : 'L' },
-  ]
+  const levels = [-4, -3, -2, -1, 0, 1, 2, 3, 4]
 
   return (
     <header className="bg-white/90 backdrop-blur-md border-b border-purple-100 sticky top-0 z-40 no-print">
@@ -51,25 +64,23 @@ export default function Header({
           </div>
 
           <div className="flex flex-wrap items-center gap-2">
-            <div className="flex items-center gap-1 rounded-lg border border-gray-200 bg-white px-1.5 py-0.5">
-              <span className="text-[10px] sm:text-xs text-gray-500 px-1 font-devanagari">
+            <label className="flex items-center gap-1.5 rounded-lg border border-gray-200 bg-white px-2 py-1 text-xs sm:text-sm">
+              <span className="text-gray-500 font-devanagari whitespace-nowrap">
                 {lang === 'mr' ? 'फॉन्ट' : 'Font'}
               </span>
-              {fontOptions.map((opt) => (
-                <button
-                  key={opt.value}
-                  onClick={() => setFontScale(opt.value)}
-                  className={`min-w-[28px] px-1.5 py-1 text-xs font-semibold rounded transition ${
-                    Math.abs(fontScale - opt.value) < 0.01
-                      ? 'bg-primary-600 text-white'
-                      : 'text-gray-600 hover:bg-primary-50'
-                  }`}
-                  title={opt.label}
-                >
-                  {opt.label}
-                </button>
-              ))}
-            </div>
+              <select
+                value={fontLevel}
+                onChange={(e) => setFontLevel(Number(e.target.value))}
+                className="border-0 bg-transparent font-semibold text-primary-700 outline-none cursor-pointer pr-1"
+              >
+                {levels.map((lv) => (
+                  <option key={lv} value={lv}>
+                    {lv > 0 ? `+${lv}` : String(lv)}
+                    {lv === 0 ? (lang === 'mr' ? ' (डिफॉल्ट)' : ' (default)') : ''}
+                  </option>
+                ))}
+              </select>
+            </label>
 
             <button
               onClick={onOpenTemplates}
