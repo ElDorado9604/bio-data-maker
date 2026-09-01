@@ -26,10 +26,10 @@ export const defaultData = {
     fatherOccupation: '',
     motherName: '',
     motherOccupation: '',
-    siblings: '',
     nativePlace: '',
     familyType: '',
   },
+  siblings: [],
   education: {
     education: '',
     occupation: '',
@@ -78,9 +78,13 @@ export const labels = {
     fatherOccupation: { mr: 'वडिलांचा व्यवसाय', en: "Father's Occupation" },
     motherName: { mr: 'आईचे नाव', en: "Mother's Name" },
     motherOccupation: { mr: 'आईचा व्यवसाय', en: "Mother's Occupation" },
-    siblings: { mr: 'भाऊ-बहीण', en: 'Siblings' },
     nativePlace: { mr: 'मूळ गाव / शहर', en: 'Native Place' },
     familyType: { mr: 'कुटुंब प्रकार', en: 'Family Type' },
+  },
+  sibling: {
+    name: { mr: 'नाव', en: 'Name' },
+    relation: { mr: 'नाते', en: 'Relation' },
+    maritalStatus: { mr: 'वैवाहिक स्थिती', en: 'Marital Status' },
   },
   education: {
     education: { mr: 'शिक्षण', en: 'Education' },
