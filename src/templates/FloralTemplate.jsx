@@ -42,10 +42,13 @@ export default function FloralTemplate({ lang, data, photo, labels, fontScale = 
 
   const siblingItems = (data.siblings || [])
     .filter((s) => s.name || s.relation || s.maritalStatus)
-    .map((s, i) => ({
-      label: lang === 'mr' ? `भाऊ/बहीण ${i + 1}` : `Sibling ${i + 1}`,
-      value: [s.name, s.relation, s.maritalStatus].filter(Boolean).join(' — '),
-    }))
+    .map((s, i) => {
+      const label =
+        (s.relation && s.relation.trim()) ||
+        (lang === 'mr' ? `भाऊ/बहीण ${i + 1}` : `Sibling ${i + 1}`)
+      const value = [s.name, s.maritalStatus].filter(Boolean).join(' — ')
+      return { label, value: value || '—' }
+    })
 
   return (
     <div className="p-5 font-devanagari text-gray-900 bg-gradient-to-br from-fuchsia-50 to-purple-50" style={{ minHeight: '297mm' }}>
