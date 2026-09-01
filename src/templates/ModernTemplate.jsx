@@ -2,11 +2,23 @@ import React from 'react'
 
 export default function ModernTemplate({ lang, data, photo, labels }) {
   const title = lang === 'mr' ? 'विवाहासाठी बायोडाटा' : 'Marriage Biodata'
+  const siblingLabel = lang === 'mr' ? 'भाऊ-बहीण' : 'Siblings'
+
+  const renderField = (label, value) => {
+    if (!value || !String(value).trim()) return null
+    return (
+      <div className="mb-2 text-sm">
+        <span className="font-semibold text-purple-800 font-devanagari">{label}:</span>{' '}
+        <span className="text-gray-800 font-devanagari">{value}</span>
+      </div>
+    )
+  }
 
   const renderSection = (sectionKey) => {
     const sectionData = data[sectionKey]
+    if (!sectionData) return null
     const titleObj = data.sectionTitles[sectionKey]
-    const fields = Object.entries(sectionData).filter(([, v]) => v && v.trim())
+    const fields = Object.entries(sectionData).filter(([, v]) => v && String(v).trim())
     if (fields.length === 0) return null
 
     return (
@@ -14,13 +26,32 @@ export default function ModernTemplate({ lang, data, photo, labels }) {
         <h3 className="text-sm font-bold text-white bg-gradient-to-r from-purple-600 to-violet-600 px-3 py-1.5 rounded-md mb-2 font-devanagari">
           {titleObj[lang]}
         </h3>
-        <div className="grid grid-cols-2 gap-x-4 gap-y-1.5 text-sm px-1">
-          {fields.map(([field, value]) => (
-            <div key={field} className={['about', 'siblings', 'kundaliNotes', 'otherExpectations', 'address'].includes(field) ? 'col-span-2' : ''}>
-              <span className="font-semibold text-purple-800 font-devanagari">
-                {labels[sectionKey][field]?.[lang] || field}:
+        <div className="px-1">
+          {fields.map(([field, value]) =>
+            renderField(labels[sectionKey][field]?.[lang] || field, value)
+          )}
+        </div>
+      </div>
+    )
+  }
+
+  const renderSiblings = () => {
+    const valid = (data.siblings || []).filter((s) => s.name || s.relation || s.maritalStatus)
+    if (valid.length === 0) return null
+    return (
+      <div className="mb-4">
+        <h3 className="text-sm font-bold text-white bg-gradient-to-r from-purple-600 to-violet-600 px-3 py-1.5 rounded-md mb-2 font-devanagari">
+          {siblingLabel}
+        </h3>
+        <div className="px-1">
+          {valid.map((s, i) => (
+            <div key={i} className="mb-2 text-sm font-devanagari">
+              <span className="font-semibold text-purple-800">
+                {lang === 'mr' ? `भाऊ/बहीण ${i + 1}` : `Sibling ${i + 1}`}:
               </span>{' '}
-              <span className="text-gray-800 font-devanagari">{value}</span>
+              <span className="text-gray-800">
+                {[s.name, s.relation, s.maritalStatus].filter(Boolean).join(' — ')}
+              </span>
             </div>
           ))}
         </div>
@@ -41,31 +72,23 @@ export default function ModernTemplate({ lang, data, photo, labels }) {
       </div>
 
       <div className="p-7">
-        <div className="flex gap-5 mb-5 items-start">
-          {photo && (
+        {photo && (
+          <div className="flex justify-center mb-5">
             <img
               src={photo}
               alt="Profile"
-              className="w-28 h-36 object-cover rounded-lg border-2 border-purple-200 shadow flex-shrink-0"
+              className="w-28 h-36 object-cover rounded-lg border-2 border-purple-200 shadow"
             />
-          )}
-          <div className="flex-1 pt-1">
-            {data.personal.fullName && (
-              <h2 className="text-xl font-bold text-purple-900 mb-2">
-                {data.personal.fullName}
-              </h2>
-            )}
-            <div className="text-sm space-y-1 text-gray-700">
-              {data.personal.dob && <p>{labels.personal.dob[lang]}: {data.personal.dob}</p>}
-              {data.personal.height && <p>{labels.personal.height[lang]}: {data.personal.height}</p>}
-              {(data.personal.religion || data.personal.caste) && (
-                <p>{labels.personal.religion[lang]}: {data.personal.religion}{data.personal.caste ? ` / ${data.personal.caste}` : ''}</p>
-              )}
-            </div>
           </div>
-        </div>
+        )}
 
-        {['personal', 'family', 'education', 'horoscope', 'expectations', 'contact'].map(renderSection)}
+        {renderSection('personal')}
+        {renderSection('family')}
+        {renderSiblings()}
+        {renderSection('education')}
+        {renderSection('horoscope')}
+        {renderSection('expectations')}
+        {renderSection('contact')}
       </div>
     </div>
   )
