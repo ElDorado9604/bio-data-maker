@@ -3,38 +3,67 @@ import { jsPDF } from 'jspdf'
 
 export async function generatePDF(element, template, lang) {
   if (!element) {
-    alert(lang === 'mr' ? 'प्रीव्ह्यू सापडले नाही' : 'Preview not found')
+    alert(
+      lang === 'mr'
+        ? 'प्रीव्ह्यू सापडले नाही — कृपया प्रीव्ह्यू उघडा'
+        : 'Preview not found — please open Preview first'
+    )
     return
   }
 
   try {
+    const A4_WIDTH_PX = 794
+    const prevWidth = element.style.width
+    const prevMaxWidth = element.style.maxWidth
+    const prevTransform = element.style.transform
+
+    element.style.width = A4_WIDTH_PX + 'px'
+    element.style.maxWidth = A4_WIDTH_PX + 'px'
+    element.style.transform = 'none'
+
+    await new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r)))
+
     const canvas = await html2canvas(element, {
-      scale: 2.5,
+      scale: 2,
       useCORS: true,
       allowTaint: true,
       backgroundColor: '#ffffff',
       logging: false,
-      windowWidth: element.scrollWidth,
-      windowHeight: element.scrollHeight,
+      width: A4_WIDTH_PX,
+      windowWidth: A4_WIDTH_PX,
+      scrollX: 0,
+      scrollY: 0,
+      onclone: (clonedDoc, clonedEl) => {
+        clonedEl.style.width = A4_WIDTH_PX + 'px'
+        clonedEl.style.maxWidth = A4_WIDTH_PX + 'px'
+        clonedEl.style.transform = 'none'
+        clonedEl.style.fontSize = element.style.fontSize || '16px'
+        clonedEl.querySelectorAll('[style*="transform"]').forEach((n) => {
+          n.style.transform = 'none'
+        })
+      },
     })
+
+    element.style.width = prevWidth
+    element.style.maxWidth = prevMaxWidth
+    element.style.transform = prevTransform
+
+    if (!canvas.width || !canvas.height) {
+      throw new Error('Empty canvas')
+    }
 
     const imgData = canvas.toDataURL('image/jpeg', 0.95)
     const pdf = new jsPDF('p', 'mm', 'a4')
     const pdfWidth = pdf.internal.pageSize.getWidth()
     const pdfHeight = pdf.internal.pageSize.getHeight()
-    const margin = 4
-
+    const margin = 3
     const usableW = pdfWidth - margin * 2
     const usableH = pdfHeight - margin * 2
 
-    const imgWidth = canvas.width
-    const imgHeight = canvas.height
-
     let width = usableW
-    let height = (imgHeight * usableW) / imgWidth
+    let height = (canvas.height * usableW) / canvas.width
 
-    // Shrink slightly to fit one page when close — avoids mid-section page cuts
-    if (height > usableH && height <= usableH * 1.35) {
+    if (height > usableH && height <= usableH * 1.4) {
       const fit = usableH / height
       width *= fit
       height = usableH
@@ -42,20 +71,13 @@ export async function generatePDF(element, template, lang) {
 
     if (height <= usableH) {
       const x = margin + (usableW - width) / 2
-      const y = margin + Math.max(0, (usableH - height) / 2)
-      pdf.addImage(imgData, 'JPEG', x, y, width, height)
+      pdf.addImage(imgData, 'JPEG', x, margin, width, height)
     } else {
-      const pageImgHeight = (usableH / width) * imgWidth
-      let srcY = 0
-      let page = 0
-      while (srcY < imgHeight - 2) {
+      const pageCount = Math.ceil(height / usableH)
+      for (let page = 0; page < pageCount; page++) {
         if (page > 0) pdf.addPage()
-        const drawnH = (imgHeight * width) / imgWidth
-        const yOffset = margin - (srcY / imgHeight) * drawnH
-        pdf.addImage(imgData, 'JPEG', margin, yOffset, width, drawnH)
-        srcY += pageImgHeight
-        page++
-        if (page > 6) break
+        const y = margin - page * usableH
+        pdf.addImage(imgData, 'JPEG', margin, y, width, height)
       }
     }
 
@@ -66,7 +88,11 @@ export async function generatePDF(element, template, lang) {
 
     pdf.save(fileName)
   } catch (err) {
-    console.error(err)
-    alert(lang === 'mr' ? 'PDF तयार करताना त्रुटी आली' : 'Error generating PDF')
+    console.error('PDF error:', err)
+    alert(
+      lang === 'mr'
+        ? 'PDF तयार करताना त्रुटी आली. कृपया पुन्हा प्रयत्न करा.'
+        : 'Error generating PDF. Please try again.'
+    )
   }
 }

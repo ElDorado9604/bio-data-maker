@@ -1,4 +1,4 @@
-import React, { useRef, useEffect } from 'react'
+import React, { useEffect } from 'react'
 import { labels } from '../data/defaultData'
 import ClassicTemplate from '../templates/ClassicTemplate'
 import ModernTemplate from '../templates/ModernTemplate'
@@ -24,19 +24,8 @@ export default function PreviewModal({
   fontScale = 1,
   onClose,
   onDownloadPDF,
-  captureRef,
 }) {
   const TemplateComponent = templateMap[template] || ClassicTemplate
-  const sheetRef = useRef(null)
-
-  useEffect(() => {
-    if (captureRef) {
-      captureRef.current = sheetRef.current
-    }
-    return () => {
-      if (captureRef) captureRef.current = null
-    }
-  }, [captureRef, template, fontScale, data, photo])
 
   useEffect(() => {
     document.body.style.overflow = 'hidden'
@@ -68,26 +57,23 @@ export default function PreviewModal({
       </div>
 
       <div className="flex-1 overflow-auto p-3 sm:p-6 bg-gray-200">
-        <div className="mx-auto" style={{ width: 'min(100%, 210mm)' }}>
+        <div className="mx-auto flex justify-center">
           <div
-            ref={sheetRef}
-            className="bg-white shadow-xl mx-auto origin-top"
+            className="bg-white shadow-xl overflow-hidden"
             style={{
               width: '210mm',
-              minHeight: '297mm',
               maxWidth: '100%',
-              fontSize: `${fontScale}rem`,
+              minHeight: '297mm',
+              fontSize: `${16 * fontScale}px`,
             }}
           >
-            <div style={{ fontSize: `${fontScale}em` }}>
-              <TemplateComponent
-                lang={lang}
-                data={data}
-                photo={photo}
-                labels={labels}
-                fontScale={fontScale}
-              />
-            </div>
+            <TemplateComponent
+              lang={lang}
+              data={data}
+              photo={photo}
+              labels={labels}
+              fontScale={fontScale}
+            />
           </div>
         </div>
       </div>
