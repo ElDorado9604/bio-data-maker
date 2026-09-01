@@ -9,11 +9,13 @@ export async function generatePDF(element, template, lang) {
 
   try {
     const canvas = await html2canvas(element, {
-      scale: 2,
+      scale: 2.5,
       useCORS: true,
       allowTaint: true,
       backgroundColor: '#ffffff',
       logging: false,
+      windowWidth: element.scrollWidth,
+      windowHeight: element.scrollHeight,
     })
 
     const imgData = canvas.toDataURL('image/jpeg', 0.95)
@@ -23,18 +25,32 @@ export async function generatePDF(element, template, lang) {
 
     const imgWidth = canvas.width
     const imgHeight = canvas.height
-    const ratio = Math.min(pdfWidth / imgWidth, pdfHeight / imgHeight)
-    const width = imgWidth * ratio
+
+    const ratio = pdfWidth / imgWidth
+    const width = pdfWidth
     const height = imgHeight * ratio
 
-    const x = (pdfWidth - width) / 2
-    const y = 0
+    if (height <= pdfHeight) {
+      const y = Math.max(0, (pdfHeight - height) / 2)
+      pdf.addImage(imgData, 'JPEG', 0, y, width, height)
+    } else {
+      let remaining = height
+      let position = 0
+      let page = 0
+      while (remaining > 0) {
+        if (page > 0) pdf.addPage()
+        pdf.addImage(imgData, 'JPEG', 0, -position, width, height)
+        position += pdfHeight
+        remaining -= pdfHeight
+        page++
+        if (page > 5) break
+      }
+    }
 
-    pdf.addImage(imgData, 'JPEG', x, y, width, height)
-
-    const fileName = lang === 'mr' 
-      ? `विवाह_बायोडाटा_${new Date().toISOString().slice(0,10)}.pdf`
-      : `Marriage_Biodata_${new Date().toISOString().slice(0,10)}.pdf`
+    const fileName =
+      lang === 'mr'
+        ? `विवाह_बायोडाटा_${new Date().toISOString().slice(0, 10)}.pdf`
+        : `Marriage_Biodata_${new Date().toISOString().slice(0, 10)}.pdf`
 
     pdf.save(fileName)
   } catch (err) {
