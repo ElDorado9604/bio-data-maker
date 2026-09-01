@@ -1,9 +1,10 @@
 import React from 'react'
 import { getSectionRows } from '../utils/fieldRows'
 
-export default function ClassicTemplate({ lang, data, photo, labels, fontScale = 1 }) {
+export default function ClassicTemplate({ lang, data, photo, photoSize = 'md', labels, fontScale = 1 }) {
   const title = lang === 'mr' ? 'विवाहासाठी बायोडाटा' : 'Marriage Biodata'
   const siblingLabel = lang === 'mr' ? 'भाऊ-बहीण' : 'Siblings'
+  const photoClass = ({ sm: 'w-20 h-28', md: 'w-28 h-36', lg: 'w-36 h-44' }[photoSize] || 'w-28 h-36')
 
   const rows = (sectionKey) => getSectionRows(data, labels, sectionKey, lang)
 
@@ -60,7 +61,7 @@ export default function ClassicTemplate({ lang, data, photo, labels, fontScale =
             <img
               src={photo}
               alt="Profile"
-              className="float-right ml-3 mb-3 w-28 h-36 object-cover rounded border-2 border-purple-300 shadow-sm"
+              className={`float-right ml-3 mb-3 ${photoClass} object-cover rounded border-2 border-purple-300 shadow-sm`}
             />
           )}
           <Section sectionKey="personal" />

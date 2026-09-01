@@ -16,6 +16,8 @@ export default function FormPanel({
   data,
   photo,
   setPhoto,
+  photoSize,
+  setPhotoSize,
   updateField,
   updateSectionTitle,
   addSibling,
@@ -31,7 +33,13 @@ export default function FormPanel({
         <h2 className="text-lg font-semibold text-primary-800 mb-3 font-devanagari">
           {lang === 'mr' ? 'फोटो (पर्यायी)' : 'Photo (Optional)'}
         </h2>
-        <PhotoUpload photo={photo} setPhoto={setPhoto} lang={lang} />
+        <PhotoUpload
+          photo={photo}
+          setPhoto={setPhoto}
+          lang={lang}
+          photoSize={photoSize}
+          setPhotoSize={setPhotoSize}
+        />
       </div>
 
       {sections.map(({ key, icon }) => {
