@@ -16,7 +16,10 @@ const templateMap = {
   floral: FloralTemplate,
 }
 
-const PreviewPanel = forwardRef(function PreviewPanel({ lang, data, photo, template }, ref) {
+const PreviewPanel = forwardRef(function PreviewPanel(
+  { lang, data, photo, template, fontScale = 1.05 },
+  ref
+) {
   const TemplateComponent = templateMap[template] || ClassicTemplate
 
   return (
@@ -25,22 +28,29 @@ const PreviewPanel = forwardRef(function PreviewPanel({ lang, data, photo, templ
         <span className="text-sm font-medium text-primary-800">
           {lang === 'mr' ? 'लाइव्ह प्रीव्ह्यू' : 'Live Preview'}
         </span>
-        <span className="text-xs text-primary-600 capitalize">{template} template</span>
+        <span className="text-xs text-primary-600 capitalize">{template}</span>
       </div>
 
-      <div className="p-4 bg-gray-100 overflow-auto max-h-[80vh]">
+      <div className="p-3 bg-gray-100 overflow-auto max-h-[75vh]">
         <div
           ref={ref}
           className="mx-auto bg-white shadow-md"
           style={{
             width: '210mm',
             minHeight: '297mm',
-            transform: 'scale(0.55)',
+            transform: 'scale(0.48)',
             transformOrigin: 'top center',
-            marginBottom: '-40%',
+            marginBottom: '-50%',
+            fontSize: `${fontScale}rem`,
           }}
         >
-          <TemplateComponent lang={lang} data={data} photo={photo} labels={labels} />
+          <TemplateComponent
+            lang={lang}
+            data={data}
+            photo={photo}
+            labels={labels}
+            fontScale={fontScale}
+          />
         </div>
       </div>
     </div>
