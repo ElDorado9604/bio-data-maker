@@ -1,6 +1,10 @@
 import React from 'react'
 
 export const FONT_LEVEL_TO_SCALE = {
+  '-8': 0.48,
+  '-7': 0.54,
+  '-6': 0.60,
+  '-5': 0.66,
   '-4': 0.72,
   '-3': 0.78,
   '-2': 0.84,
@@ -27,7 +31,7 @@ export default function Header({
   onGeneratePDF,
   onReset,
 }) {
-  const levels = [-4, -3, -2, -1, 0, 1, 2, 3, 4]
+  const levels = [-8, -7, -6, -5, -4, -3, -2, -1, 0, 1, 2, 3, 4]
 
   return (
     <header className="bg-white/90 backdrop-blur-md border-b border-purple-100 sticky top-0 z-40 no-print">
